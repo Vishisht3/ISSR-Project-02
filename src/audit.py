@@ -7,11 +7,11 @@ Provides transparency, debugging capability, and regulatory compliance support.
 Every escalation threshold crossing, action taken, and human override is logged
 here. No automated action fires without an audit record.
 
-Storage backends
-----------------
-The default backend writes to a JSON-lines file (one record per line).
-Swap `_backend` for a database writer in production (e.g. PostgreSQL with
-append-only table policy enforced at the DB level).
+Storage backend
+---------------
+Writes to a JSON-lines file (one record per line, append-only).
+The backend class can be replaced with a database writer by subclassing
+_JsonLinesBackend and passing it to AuditLog.
 """
 
 from __future__ import annotations

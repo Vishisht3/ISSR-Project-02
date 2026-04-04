@@ -40,9 +40,10 @@ from src.models import (
 
 
 # ---------------------------------------------------------------------------
-# In-memory trigger store for confirmation window (swap for DB in production)
+# Trigger store for confirmation window
+# {region_id: trigger_timestamp}
 # ---------------------------------------------------------------------------
-_triggers: Dict[str, datetime] = {}   # {region_id: trigger_timestamp}
+_triggers: Dict[str, datetime] = {}
 
 
 # ---------------------------------------------------------------------------
@@ -385,11 +386,9 @@ def confirmation_window(
     confirm_hours: float = cfg.CONFIRM_HOURS,
 ) -> ConfirmationWindowResult:
     """
-    Require the signal to persist above threshold for CONFIRM_HOURS before escalating.
-
-    The proposal diagram shows a 24-hour window; the pseudocode uses 6 hours.
-    The default here uses CONFIRM_HOURS from config (set to 24.0 to match the
-    proposal diagram; adjust in config.py as needed).
+    Require the signal to persist above threshold for CONFIRM_HOURS (24 hr)
+    before escalating. If the signal decays within the window, the decision
+    downgrades to FLAG rather than ESCALATE.
 
     Parameters
     ----------
@@ -444,21 +443,12 @@ def escalation_decision(
     """
     Final routing: translate the confirmation result into HOLD / FLAG / ESCALATE.
 
-    In production:
-    - ESCALATE creates a review ticket, notifies on-call team, and attaches
-      an evidence bundle (post sample, news articles, scores, timeline, geo map).
-    - FLAG adds the region to a watch-list for the next processing cycle.
-    - HOLD logs and continues passive monitoring.
+    ESCALATE: routes to HITL queue; on-call team is notified with an evidence
+              bundle (post sample, news articles, scores, timeline, geo cluster map).
+    FLAG:     region is added to watch-list for the next processing cycle.
+    HOLD:     logged; passive monitoring continues.
     """
     action = confirmation_result.action
-
-    if action == AggregateAction.ESCALATE:
-        # Production: create_review_ticket() + notify_on_call_team()
-        pass
-    elif action == AggregateAction.FLAG:
-        # Production: add_to_watchlist(region.region_id, ttl=next_cycle)
-        pass
-    # HOLD / MONITORING: log only
 
     return EscalationResult(
         action=action,

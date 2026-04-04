@@ -93,7 +93,7 @@ class QueueItem:
 
 
 # ---------------------------------------------------------------------------
-# Queue storage backend (JSON-lines, swap for DB in production)
+# Queue storage backend (JSON-lines, append-only)
 # ---------------------------------------------------------------------------
 
 _DEFAULT_QUEUE_PATH = os.path.join(

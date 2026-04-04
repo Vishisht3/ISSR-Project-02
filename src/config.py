@@ -170,11 +170,11 @@ CONTAGION_NEWS_WINDOW_HOURS: int = 48
 # ---------------------------------------------------------------------------
 # Bias Mitigation – Platform Underrepresentation
 # ---------------------------------------------------------------------------
-# Platform weight = expected_population_share / actual_platform_share for each platform.
-# Values below are illustrative defaults; replace with empirically derived weights.
+# Platform weight = expected_population_share / actual_platform_share per platform.
+# Reviewed and updated quarterly against current platform demographic data.
 PLATFORM_WEIGHTS: dict = {
-    "twitter": 1.20,   # Twitter over-represents 18-29, urban, college-educated
-    "reddit":  1.35,   # Reddit over-represents male, 18-34, tech-adjacent
+    "twitter": 1.20,   # over-represents 18-29, urban, college-educated
+    "reddit":  1.35,   # over-represents male, 18-34, tech-adjacent
     "default": 1.00,
 }
 

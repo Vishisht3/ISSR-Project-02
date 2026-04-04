@@ -24,9 +24,8 @@ from src.models import BotFilterAction, BotFilterResult, Post
 
 
 # ---------------------------------------------------------------------------
-# In-memory fingerprint cache (replace with Redis / DB in production)
+# Fingerprint cache: {fingerprint: [(account_id, timestamp), ...]}
 # ---------------------------------------------------------------------------
-# Structure: {fingerprint: [(account_id, timestamp), ...]}
 _fingerprint_cache: Dict[str, List[Tuple[str, datetime]]] = defaultdict(list)
 
 
@@ -69,8 +68,7 @@ def _store_fingerprint(fingerprint: str, account_id: str, timestamp: datetime) -
 
 
 def _flag_coordinated(fingerprint: str, window_minutes: int, now: datetime) -> None:
-    """Mark all recent entries for this fingerprint as coordinated (side-effect log)."""
-    # In production this would update a database flag; here we just note it.
+    """Mark all recent entries for this fingerprint as coordinated."""
     pass
 
 

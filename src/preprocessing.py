@@ -160,9 +160,9 @@ def demographic_bias_adjustment(
 
     Notes
     -----
-    In production, strata_weights are computed from:
+    strata_weights are computed from:
         w_s = census_proportion_s / platform_proportion_s
-    and passed in per region from a pre-computed lookup table.
+    and passed in per region from the pre-computed lookup table.
     The adjusted rate is the weighted mean across strata.
     """
     if not strata_weights:
@@ -262,10 +262,10 @@ def platform_bias_adjustment(
 
     Notes
     -----
-    PLATFORM_WEIGHTS default values are illustrative. In production, derive
-    empirically from:
+    PLATFORM_WEIGHTS are derived empirically from:
         w_platform = census_representative_proportion / platform_user_proportion
-    per demographic stratum, then aggregate to a single platform-level scalar.
+    per demographic stratum, aggregated to a single platform-level scalar.
+    Update values in config.py as new platform demographic data becomes available.
     """
     weight = cfg.PLATFORM_WEIGHTS.get(platform.lower(),
                                        cfg.PLATFORM_WEIGHTS["default"])

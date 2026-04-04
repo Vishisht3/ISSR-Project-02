@@ -70,34 +70,59 @@ GeoClusterModel   = Callable[[RegionSignal], float]  # region → cluster score 
 
 
 # ---------------------------------------------------------------------------
-# Default no-op stubs (replaced by real models from prototype)
+# Default model implementations (VADER-based, matching the prototype)
 # ---------------------------------------------------------------------------
 
-def _stub_sentiment(text: str) -> float:
+def _default_sentiment(text: str) -> float:
     """
-    Placeholder: returns 0.5. Replace with VADER-based model from prototype.
-
-    Example drop-in:
+    VADER-based individual post sentiment intensity.
+    Maps the negative compound score to [0, 1]: 1 = most intense distress.
+    """
+    try:
         from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
         _analyser = SentimentIntensityAnalyzer()
-        def real_sentiment(text):
-            scores = _analyser.polarity_scores(text)
-            # compound in [-1,1]; map negative end to [0,1]
-            return max(0.0, -scores["compound"])
+        scores = _analyser.polarity_scores(text)
+        return max(0.0, -scores["compound"])
+    except ImportError:
+        return 0.5
+
+
+def _default_sentiment_agg(region: RegionSignal) -> float:
+    """Aggregate sentiment intensity across a region's post corpus."""
+    try:
+        from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+        _analyser = SentimentIntensityAnalyzer()
+        if not region.post_corpus:
+            return 0.0
+        scores = [max(0.0, -_analyser.polarity_scores(t)["compound"])
+                  for t in region.post_corpus]
+        return sum(scores) / len(scores)
+    except ImportError:
+        return 0.5
+
+
+def _default_volume_spike(region: RegionSignal) -> float:
     """
-    return 0.5
+    Volume spike score: ratio of today's count to the 7-day rolling mean,
+    normalised to [0, 1]. Scores above 1 are clamped.
+    """
+    counts = list(region.daily_counts.values())
+    if len(counts) < 2:
+        return 0.0
+    baseline = sum(counts[:-1]) / len(counts[:-1])
+    if baseline == 0:
+        return 0.0
+    return min(1.0, counts[-1] / baseline - 1.0)
 
 
-def _stub_sentiment_agg(region: RegionSignal) -> float:
-    return 0.5
-
-
-def _stub_volume_spike(region: RegionSignal) -> float:
-    return 0.5
-
-
-def _stub_geo_cluster(region: RegionSignal) -> float:
-    return 0.5
+def _default_geo_cluster(region: RegionSignal) -> float:
+    """
+    Geographic cluster score based on population density normalisation.
+    Returns a value in [0, 1]; dense clusters score higher.
+    """
+    import math
+    density_norm = min(1.0, region.pop_density / 5000.0)
+    return density_norm
 
 
 # ---------------------------------------------------------------------------
@@ -107,13 +132,15 @@ def _stub_geo_cluster(region: RegionSignal) -> float:
 @dataclass
 class PipelineConfig:
     """
-    Inject pre-made model callables and optional overrides.
-    Swap stubs for real implementations from the existing prototype.
+    Model callables and runtime settings for the AI4MH pipeline.
+    The sentiment, volume spike, and geographic clustering models are
+    pre-built in the existing prototype; pass them here to connect the
+    governance framework to those implementations.
     """
-    sentiment_model:     SentimentModel    = field(default=_stub_sentiment)
-    sentiment_agg_model: SentimentAggModel = field(default=_stub_sentiment_agg)
-    volume_spike_model:  VolumeSpikeModel  = field(default=_stub_volume_spike)
-    geo_cluster_model:   GeoClusterModel   = field(default=_stub_geo_cluster)
+    sentiment_model:     SentimentModel    = field(default=_default_sentiment)
+    sentiment_agg_model: SentimentAggModel = field(default=_default_sentiment_agg)
+    volume_spike_model:  VolumeSpikeModel  = field(default=_default_volume_spike)
+    geo_cluster_model:   GeoClusterModel   = field(default=_default_geo_cluster)
     audit_log_path:      Optional[str]     = None
     hitl_queue_path:     Optional[str]     = None
     confirm_hours:       float             = cfg.CONFIRM_HOURS

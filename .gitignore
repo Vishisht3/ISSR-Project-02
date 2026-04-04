@@ -1,0 +1,20 @@
+# Docx unpacking workspace
+unpacked/
+
+# Runtime data
+data/
+
+# Claude Code settings
+.claude/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
+~$*
