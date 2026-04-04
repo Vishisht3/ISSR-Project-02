@@ -1,7 +1,7 @@
-# GSoC2025-AI4MH
+# GSoC2026-AI4MH
 
 **AI-Powered Social Media Crisis Detection Pipeline for Mental Health**
-GSoC 2025 @ HumanAI
+GSoC 2026 @ HumanAI
 
 ---
 
