@@ -154,3 +154,5 @@ MIT License — see [LICENSE](LICENSE) for details.
 This project was carried out under the **Google Summer of Code 2025** programme, with organisational support from **HumanAI** and the **Institute for Social Science Research, The University of Alabama**.
 
 Pipeline parameters and calendar dampening factors are reviewed quarterly in consultation with the clinical advisory board.
+
+NOTE: THIS README WAS GENERATED USING CLAUDE AI
