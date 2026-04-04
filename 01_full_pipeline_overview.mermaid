@@ -1,0 +1,43 @@
+flowchart TD
+    A["Raw Data\n(social media posts, geo-tagged)"] --> B["Bot / Coordination Filter"]
+    B --> C["Minimum Sample Size Check\n(population-density weighted)"]
+    C --> D["Smoothing / Normalisation\n(rolling avg, calendar dampen)"]
+    D --> E["CI / Uncertainty Estimate\n(data confidence score)"]
+    E --> F{"Split"}
+
+    F -->|Individual Track| G["Severity Scoring\n(intensity + isolation signals)"]
+    F -->|Aggregate Track| K["Event Classification\n(calendar / celebrity / local MH / socioeconomic / global)"]
+
+    G --> H["First-time Poster Flag"]
+    H --> I{"Threshold Decision"}
+    I -->|Below low| I1["Passive Resource Surfacing"]
+    I -->|Mid-range| I2["Anonymous Helpline Prompt"]
+    I -->|Above high| I3["Direct Human Review"]
+
+    K --> L["Media Corroboration\n(news scrape, timing+geo+keyword)"]
+    L --> M{"Bucket"}
+    M -->|Reactive| M1["Reactive to External Event"]
+    M -->|Personal| M2["Personal Distress Signal"]
+    M1 & M2 --> N["Crisis Scoring\n(sentiment + volume + geo)\n⚙ PRE-MADE MODELS"]
+    N --> O["Confidence-modulated\nThreshold Comparison"]
+    O --> P["Confirmation Window\n(persist N hours)"]
+    P --> Q{"Escalation Decision"}
+    Q -->|Hold| Q1["No Action"]
+    Q -->|Flag| Q2["Flag for Monitoring"]
+    Q -->|Escalate| Q3["Escalate to Human Review"]
+
+    I1 & I2 & I3 --> R["Audit Log"]
+    Q1 & Q2 & Q3 --> R
+    R --> S["Heatmap Output"]
+
+    style N fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    style B fill:#fff3e0,stroke:#e65100
+    style C fill:#fff3e0,stroke:#e65100
+    style D fill:#fff3e0,stroke:#e65100
+    style E fill:#fff3e0,stroke:#e65100
+    style G fill:#e3f2fd,stroke:#1565c0
+    style H fill:#e3f2fd,stroke:#1565c0
+    style K fill:#fce4ec,stroke:#c62828
+    style L fill:#fce4ec,stroke:#c62828
+    style O fill:#fce4ec,stroke:#c62828
+    style P fill:#fce4ec,stroke:#c62828

@@ -1,0 +1,67 @@
+flowchart TD
+    subgraph EVT["Event Classification"]
+        E1["Aggregate signal\nfor region R"] --> E2["Feature extraction:\n- keyword clusters\n- temporal pattern\n- geo spread"]
+        E2 --> E3{"Match against\nevent tier list"}
+        E3 -->|Calendar| E4["Known date:\nholiday, anniversary,\nawareness day"]
+        E3 -->|Celebrity| E5["Celebrity death\nor public incident"]
+        E3 -->|Local MH| E6["Local mental health\nevent: cluster,\ncommunity trauma"]
+        E3 -->|Socioeconomic| E7["Economic shock:\nlayoffs, cost-of-living"]
+        E3 -->|Global| E8["Global crisis:\npandemic, conflict"]
+        E3 -->|None matched| E9["Unclassified\n→ flag for review"]
+        E4 & E5 & E6 & E7 & E8 & E9 --> E10["event_type + event_weight"]
+    end
+
+    subgraph MED["Media Corroboration"]
+        E10 --> M1["Query local news API\nwindow: ±24 hrs\ngeo: region R"]
+        M1 --> M2["Keyword overlap\nscore vs. post corpus"]
+        M2 --> M3["Timing alignment\nscore (lag analysis)"]
+        M3 --> M4["corroboration_score =\nmean(keyword_overlap,\ntiming_alignment)"]
+        M4 --> M5{"corroboration_score\n> θ_corr?"}
+        M5 -->|Yes| M6["media_confirmed = TRUE"]
+        M5 -->|No| M7["media_confirmed = FALSE"]
+    end
+
+    subgraph BKT["Bucket: Reactive vs Personal"]
+        M6 & M7 --> BK1{"event_type ≠ None\nAND media_confirmed?"}
+        BK1 -->|Yes| BK2["REACTIVE:\nresponse to\nexternal event"]
+        BK1 -->|No| BK3["PERSONAL DISTRESS:\norganic signal"]
+        BK2 --> BK4["Apply reactive\ndampening weight\nδ ∈ (0.3, 0.7)"]
+        BK3 --> BK5["Full weight\nδ = 1.0"]
+    end
+
+    subgraph CRS["Crisis Scoring"]
+        BK4 & BK5 --> C1["Gather pre-made scores:\n⚙ sentiment_intensity_agg\n⚙ volume_spike_score\n⚙ geo_cluster_score"]
+        C1 --> C2["crisis_raw =\nw_s × sentiment_agg\n+ w_v × volume_spike\n+ w_g × geo_cluster"]
+        C2 --> C3["crisis_adj =\ncrisis_raw × δ\n(bucket weight)"]
+    end
+
+    subgraph CONF["Confidence-modulated Threshold"]
+        C3 --> CF1["Retrieve region\nconfidence score\n(from preprocessing)"]
+        CF1 --> CF2["effective_threshold =\nbase_threshold ×\n(1 + (1 − conf) × penalty)"]
+        CF2 --> CF3{"crisis_adj >\neffective_threshold?"}
+        CF3 -->|No| CF4["HOLD"]
+        CF3 -->|Yes| CF5["Proceed to\nconfirmation window"]
+    end
+
+    subgraph WIN["Confirmation Window"]
+        CF5 --> W1["Record trigger\ntimestamp t₀"]
+        W1 --> W2["Monitor for\nN hours"]
+        W2 --> W3{"Signal persists\nabove threshold\nfor ≥ N hrs?"}
+        W3 -->|No| W4["Signal decayed\n→ downgrade to FLAG"]
+        W3 -->|Yes| W5["Signal confirmed\n→ ESCALATE"]
+    end
+
+    subgraph ESC["Escalation Decision"]
+        CF4 --> D1["HOLD:\nlog + continue\nmonitoring"]
+        W4 --> D2["FLAG:\nadd to watch list\nfor next cycle"]
+        W5 --> D3["ESCALATE:\nroute to human\nreview team"]
+    end
+
+    D1 & D2 & D3 --> AUD["→ Audit Log"]
+
+    style C1 fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    style D1 fill:#e3f2fd,stroke:#1565c0
+    style D2 fill:#fff9c4,stroke:#f57f17
+    style D3 fill:#ffcdd2,stroke:#b71c1c
+    style BK2 fill:#e0f7fa,stroke:#006064
+    style BK3 fill:#fce4ec,stroke:#880e4f

@@ -1,0 +1,24 @@
+# AI4MH Crisis Detection Pipeline — dependencies
+# Install with: pip install -r requirements.txt
+
+# Sentiment analysis (pre-made model, already in prototype)
+vaderSentiment>=3.3.2
+
+# Geographic data handling (already in prototype)
+geopandas>=0.14.0
+shapely>=2.0.0
+
+# Dashboard visualisation (already in prototype)
+folium>=0.15.0
+plotly>=5.18.0
+
+# Data handling
+pandas>=2.0.0
+numpy>=1.26.0
+
+# News API client (for media corroboration)
+# Replace with whichever news API is in use (NewsAPI, GNews, etc.)
+requests>=2.31.0
+
+# Optional: faster JSON serialisation for audit log
+orjson>=3.9.0

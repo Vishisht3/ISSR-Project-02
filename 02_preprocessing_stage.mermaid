@@ -1,0 +1,43 @@
+flowchart TD
+    subgraph BOT["Bot / Coordination Filter"]
+        B1["Incoming post"] --> B2{"Account age\n< threshold?"}
+        B2 -->|Yes| B3{"Posting frequency\n> N posts/min?"}
+        B2 -->|No| B6["Pass"]
+        B3 -->|Yes| B4["Flag as bot\n→ discard"]
+        B3 -->|No| B5{"Text entropy\nbelow floor?"}
+        B5 -->|Yes| B4
+        B5 -->|No| B7{"Coordination check:\nidentical text in\n≥ K accounts\nwithin T minutes?"}
+        B7 -->|Yes| B4
+        B7 -->|No| B6
+    end
+
+    subgraph MSS["Minimum Sample Size Check"]
+        M1["Filtered posts\nfor region R"] --> M2["Lookup population\ndensity D_R"]
+        M2 --> M3["Compute required\nmin_n = base_n × density_weight(D_R)"]
+        M3 --> M4{"count(posts_R)\n≥ min_n?"}
+        M4 -->|Yes| M5["Region R: proceed"]
+        M4 -->|No| M6["Region R: mark\nlow-confidence,\nwiden geo window\nor defer"]
+    end
+
+    subgraph SMOOTH["Smoothing / Normalisation"]
+        S1["Regional daily\npost counts"] --> S2["Apply 7-day\nrolling average"]
+        S2 --> S3["Calendar lookup:\nis today a known\nevent date?"]
+        S3 -->|Yes| S4["Apply calendar\ndampening factor\nα ∈ (0,1)"]
+        S3 -->|No| S5["No dampening"]
+        S4 & S5 --> S6["Normalise to\nper-capita rate\n(posts / 100k pop)"]
+    end
+
+    subgraph CI["CI / Uncertainty Estimate"]
+        C1["Smoothed, normalised\nsignal for region"] --> C2["Compute standard error\nSE = σ / √n"]
+        C2 --> C3["Build confidence interval\nCI = mean ± z × SE"]
+        C3 --> C4["Derive confidence score\nconf = 1 − (CI_width / mean)"]
+        C4 --> C5["Clamp conf\nto [0, 1]"]
+        C5 --> C6["Attach conf score\nto region payload"]
+    end
+
+    BOT --> MSS --> SMOOTH --> CI
+
+    style B4 fill:#ffcdd2,stroke:#b71c1c
+    style B6 fill:#c8e6c9,stroke:#1b5e20
+    style M5 fill:#c8e6c9,stroke:#1b5e20
+    style M6 fill:#fff9c4,stroke:#f57f17

@@ -1,0 +1,30 @@
+flowchart TD
+    subgraph SEV["Severity Scoring"]
+        S1["Individual post\n+ metadata"] --> S2["Run sentiment intensity\nmodel ⚙ PRE-MADE"]
+        S2 --> S3["Extract isolation signals:\n- time of post (late night?)\n- reply count = 0?\n- mentions of being alone\n- no social graph activity"]
+        S3 --> S4["isolation_score =\nweighted sum of\nisolation signals"]
+        S4 --> S5["severity =\nw1 × sentiment_intensity\n+ w2 × isolation_score"]
+    end
+
+    subgraph FTP["First-time Poster Flag"]
+        S5 --> F1{"Account has\nprior post history\nin dataset?"}
+        F1 -->|No| F2["first_time = TRUE\nseverity ×= boost_factor"]
+        F1 -->|Yes| F3["first_time = FALSE\nseverity unchanged"]
+        F2 & F3 --> F4["Final severity score"]
+    end
+
+    subgraph THR["Threshold Decision"]
+        F4 --> T1{"severity < θ_low?"}
+        T1 -->|Yes| T2["ACTION:\nPassive resource surfacing\n(banner, sidebar link)"]
+        T1 -->|No| T3{"severity < θ_high?"}
+        T3 -->|Yes| T4["ACTION:\nAnonymous helpline prompt\n(non-intrusive overlay)"]
+        T3 -->|No| T5["ACTION:\nDirect human review\n(queue to moderator)"]
+    end
+
+    T2 & T4 & T5 --> AUD["→ Audit Log"]
+
+    style S2 fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    style T2 fill:#e3f2fd,stroke:#1565c0
+    style T4 fill:#fff9c4,stroke:#f57f17
+    style T5 fill:#ffcdd2,stroke:#b71c1c
+    style F2 fill:#fff9c4,stroke:#f57f17
