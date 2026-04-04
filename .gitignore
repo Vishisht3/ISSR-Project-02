@@ -4,9 +4,6 @@ unpacked/
 # Runtime data
 data/
 
-# Claude Code settings
-.claude/
-
 # Python
 __pycache__/
 *.pyc
