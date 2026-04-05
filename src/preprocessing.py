@@ -58,6 +58,20 @@ def sample_size_check(region: RegionSignal, date_key: str) -> SampleCheckResult:
     """
     Ensure the region has enough posts for statistical validity.
 
+    The effective sample count used against the threshold is determined by the
+    more generous of two signals:
+
+    1. Raw post count  — daily_counts[date_key]
+    2. Engagement-weighted count — engagement_weighted_counts[date_key]
+       Each post contributes log2(1 + upvotes + comments) instead of 1,
+       so a small number of highly engaged posts can satisfy the gate on their
+       own. This reflects the reality that a post with thousands of upvotes
+       carries far more community-level signal than many silent posts.
+
+    When engagement_weighted_counts is absent (e.g. non-Reddit sources, or
+    older code paths that don't supply it), the check falls back to raw counts
+    only — identical to the original behaviour.
+
     Parameters
     ----------
     region   : RegionSignal with daily_counts and pop_density populated
@@ -65,14 +79,27 @@ def sample_size_check(region: RegionSignal, date_key: str) -> SampleCheckResult:
     """
     density_w = _density_weight(region.pop_density)
     min_n = cfg.BASE_MIN_N * density_w
-    count = region.daily_counts.get(date_key, 0)
 
-    if count >= min_n:
-        return SampleCheckResult(status=SampleStatus.SUFFICIENT, n=count, min_n=min_n)
+    raw_count = region.daily_counts.get(date_key, 0)
+
+    # Use engagement-weighted count if available; take the higher of the two
+    # so that either raw volume OR high engagement independently satisfies the gate.
+    if region.engagement_weighted_counts is not None:
+        eng_count = region.engagement_weighted_counts.get(date_key, 0.0)
+        effective_count = max(float(raw_count), eng_count)
+    else:
+        effective_count = float(raw_count)
+
+    if effective_count >= min_n:
+        return SampleCheckResult(
+            status=SampleStatus.SUFFICIENT,
+            n=int(effective_count),
+            min_n=min_n,
+        )
     else:
         return SampleCheckResult(
             status=SampleStatus.INSUFFICIENT,
-            n=count,
+            n=int(effective_count),
             min_n=min_n,
             fallback="WIDEN_GEO | DEFER",
         )

@@ -70,35 +70,49 @@ GeoClusterModel   = Callable[[RegionSignal], float]  # region → cluster score 
 
 
 # ---------------------------------------------------------------------------
-# Default model implementations (VADER-based, matching the prototype)
+# Default model implementations (nltk VADER — same package as Yixing's pipeline)
 # ---------------------------------------------------------------------------
+# Both tracks use nltk's SentimentIntensityAnalyzer, which is identical in
+# output to the vaderSentiment package. Using the same package across both
+# codebases eliminates any risk of subtle scoring differences caused by
+# version skew between the two VADER distributions.
+
+def _get_nltk_analyser():
+    """
+    Return a shared nltk VADER analyser, downloading the lexicon on first use.
+    Falls back to None if nltk is not installed.
+    """
+    try:
+        import nltk
+        from nltk.sentiment import SentimentIntensityAnalyzer
+        try:
+            nltk.data.find("sentiment/vader_lexicon.zip")
+        except LookupError:
+            nltk.download("vader_lexicon", quiet=True)
+        return SentimentIntensityAnalyzer()
+    except ImportError:
+        return None
+
 
 def _default_sentiment(text: str) -> float:
     """
-    VADER-based individual post sentiment intensity.
+    nltk VADER individual post sentiment intensity.
     Maps the negative compound score to [0, 1]: 1 = most intense distress.
     """
-    try:
-        from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-        _analyser = SentimentIntensityAnalyzer()
-        scores = _analyser.polarity_scores(text)
-        return max(0.0, -scores["compound"])
-    except ImportError:
+    analyser = _get_nltk_analyser()
+    if analyser is None:
         return 0.5
+    return max(0.0, -analyser.polarity_scores(text)["compound"])
 
 
 def _default_sentiment_agg(region: RegionSignal) -> float:
-    """Aggregate sentiment intensity across a region's post corpus."""
-    try:
-        from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-        _analyser = SentimentIntensityAnalyzer()
-        if not region.post_corpus:
-            return 0.0
-        scores = [max(0.0, -_analyser.polarity_scores(t)["compound"])
-                  for t in region.post_corpus]
-        return sum(scores) / len(scores)
-    except ImportError:
-        return 0.5
+    """Aggregate nltk VADER sentiment intensity across a region's post corpus."""
+    analyser = _get_nltk_analyser()
+    if analyser is None or not region.post_corpus:
+        return 0.0
+    scores = [max(0.0, -analyser.polarity_scores(t)["compound"])
+              for t in region.post_corpus]
+    return sum(scores) / len(scores)
 
 
 def _default_volume_spike(region: RegionSignal) -> float:
@@ -472,6 +486,7 @@ class CrisisPipeline:
         news_by_region: Optional[Dict[str, List[Dict[str, Any]]]] = None,
         strata_by_region: Optional[Dict[str, Dict[str, float]]] = None,
         volume_ratios: Optional[Dict[str, float]] = None,
+        geo_concentrations: Optional[Dict[str, float]] = None,
         score_histories: Optional[Dict[str, List[float]]] = None,
         now: Optional[datetime] = None,
     ) -> List[Optional[Dict[str, Any]]]:
@@ -481,11 +496,21 @@ class CrisisPipeline:
         Regions that result in ESCALATE are placed in the HITL queue.
         Contagion check runs automatically for every region.
         All four bias layers are applied in sequence.
+
+        Parameters
+        ----------
+        geo_concentrations : optional per-region geographic concentration scores
+            in [0, 1]. When provided, these are forwarded to the LOCAL_MH event
+            classifier (Component 8) so that spatially clustered signals score
+            higher than diffuse, subreddit-wide signals. Without this parameter
+            LOCAL_MH classification is penalised — pass it whenever the upstream
+            pipeline can supply a geographic clustering signal.
         """
-        news_by_region   = news_by_region   or {}
-        strata_by_region = strata_by_region or {}
-        volume_ratios    = volume_ratios    or {}
-        score_histories  = score_histories  or {}
+        news_by_region    = news_by_region    or {}
+        strata_by_region  = strata_by_region  or {}
+        volume_ratios     = volume_ratios     or {}
+        geo_concentrations = geo_concentrations or {}
+        score_histories   = score_histories   or {}
         today = (now or datetime.utcnow()).date()
 
         multi_spike = sum(
@@ -502,6 +527,7 @@ class CrisisPipeline:
                 strata_weights=strata_by_region.get(region.region_id),
                 news_articles=news_by_region.get(region.region_id),
                 volume_ratio=volume_ratios.get(region.region_id, 1.0),
+                geo_concentration=geo_concentrations.get(region.region_id, 0.0),
                 multi_region_spike=multi_spike,
                 score_history=score_histories.get(region.region_id),
                 today=today,

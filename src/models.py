@@ -84,6 +84,11 @@ class RegionSignal:
     spike_start_time: Optional[datetime] = None
     smoothed_count: float = 0.0
     per_capita_rate: float = 0.0
+    # Optional engagement-weighted daily counts.
+    # Each post contributes log2(1 + upvotes + comments) instead of a flat 1,
+    # so high-engagement posts satisfy the sample-size gate with fewer raw
+    # posts. When None, sample_size_check falls back to raw daily_counts.
+    engagement_weighted_counts: Optional[Dict[str, float]] = None
     raw_payload: Dict[str, Any] = field(default_factory=dict)
 
 

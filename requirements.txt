@@ -1,8 +1,10 @@
 # AI4MH Crisis Detection Pipeline — dependencies
 # Install with: pip install -r requirements.txt
 
-# Sentiment analysis (pre-made model, already in prototype)
-vaderSentiment>=3.3.2
+# Sentiment analysis — nltk VADER (same package as Yixing's pipeline)
+# Using nltk across both codebases ensures identical VADER scoring with no
+# version skew between the two distributions.
+nltk>=3.8.1
 
 # Geographic data handling (already in prototype)
 geopandas>=0.14.0
