@@ -41,7 +41,7 @@ Key design principles:
 - Four-layer bias mitigation: platform weights, post-stratification (Giorgi et al., 2022), rural adjacency weighting, intervention bias correction.
 - nltk VADER sentiment intensity scoring (same package as Yixing's prototype) with isolation signal sub-weights and ideation keyword detection.
 - First-time poster severity uplift (1.25×).
-- Five-tier contextual event classification: CALENDAR, CELEBRITY, LOCAL\_MH, SOCIOECONOMIC, GLOBAL.
+- Five-tier contextual event classification: CALENDAR, CELEBRITY, LOCAL_MH, SOCIOECONOMIC, GLOBAL.
 - Three-axis media corroboration: keyword overlap + Gaussian timing decay + geographic scope.
 - Reactive vs Personal Distress bucketing with per-event dampening weights.
 - Confidence-modulated crisis threshold with trend-velocity early warning (linear regression).
@@ -57,22 +57,22 @@ Key design principles:
 
 ## 🚧 Current Status
 
-- [x] Bot / coordination filter
-- [x] Minimum sample size check (density-weighted + engagement-weighted)
-- [x] Smoothing, normalisation, and calendar dampening
-- [x] Four-layer bias mitigation
-- [x] CI / uncertainty estimation (classifier-error-corrected)
-- [x] Individual track: severity scoring, first-time flag, threshold routing
-- [x] Contagion flagging (Werther Effect detection)
-- [x] Aggregate track: event classification, media corroboration, bucketing
-- [x] Aggregate track: crisis scoring, confidence-modulated threshold, confirmation window
-- [x] HITL review queue (blocking pattern)
-- [x] Audit log (immutable append-only)
-- [x] Geographic heatmap output
-- [x] Campaign effectiveness feedback loop
-- [x] Pipeline orchestration (`CrisisPipeline` class)
-- [x] Pipeline pseudocode document (`Pipeline_Pseudocode.docx`)
-- [x] Integration adapter for Yixing Fan's ISSR prototype (`src/issr_adapter.py`)
+- [] Bot / coordination filter
+- [] Minimum sample size check (density-weighted + engagement-weighted)
+- [] Smoothing, normalisation, and calendar dampening
+- [] Four-layer bias mitigation
+- [] CI / uncertainty estimation (classifier-error-corrected)
+- [] Individual track: severity scoring, first-time flag, threshold routing
+- [] Contagion flagging (Werther Effect detection)
+- [] Aggregate track: event classification, media corroboration, bucketing
+- [] Aggregate track: crisis scoring, confidence-modulated threshold, confirmation window
+- [] HITL review queue (blocking pattern)
+- [] Audit log (immutable append-only)
+- [] Geographic heatmap output
+- [] Campaign effectiveness feedback loop
+- [] Pipeline orchestration (`CrisisPipeline` class)
+- [] Pipeline pseudocode document (`Pipeline_Pseudocode.docx`)
+- [] Integration adapter for Yixing Fan's ISSR prototype (`src/issr_adapter.py`)
 
 Future work: live dashboard integration, multi-language sentiment models, cross-platform demographic data refresh.
 
@@ -195,11 +195,11 @@ action = risk_level_to_action("High-Risk")  # → IndividualAction.HUMAN_REVIEW
 
 ## 📚 References
 
-- Daughton, A. R., & Paul, M. J. (2019). Identifying Protective Factors for Depression on Twitter. *ICWSM*.
-- Gera, N., & Ciampaglia, G. L. (2022). Tweet Health Correlations and Bot Removal. *WebSci*.
-- Giorgi, S., et al. (2022). Robust Post-stratification for Social Media Health Estimates. *ACL*.
-- Aguirre, C., & Dredze, M. (2021). Demographic Bias in Depression Classifiers. *W-NUT*.
-- McClellan, C., et al. (2017). Using Social Media to Monitor Mental Health Discussions. *JAMIA*.
+- Daughton, A. R., & Paul, M. J. (2019). Identifying Protective Factors for Depression on Twitter. _ICWSM_.
+- Gera, N., & Ciampaglia, G. L. (2022). Tweet Health Correlations and Bot Removal. _WebSci_.
+- Giorgi, S., et al. (2022). Robust Post-stratification for Social Media Health Estimates. _ACL_.
+- Aguirre, C., & Dredze, M. (2021). Demographic Bias in Depression Classifiers. _W-NUT_.
+- McClellan, C., et al. (2017). Using Social Media to Monitor Mental Health Discussions. _JAMIA_.
 - Daruna, A. (2026). Human-in-the-Loop Escalation Patterns for Clinical AI Systems.
 
 ---
@@ -215,3 +215,5 @@ MIT License — see [LICENSE](LICENSE) for details.
 This project was carried out under the **Google Summer of Code 2025** programme, with organisational support from **HumanAI** and the **Institute for Social Science Research, The University of Alabama**.
 
 Pipeline parameters and calendar dampening factors are reviewed quarterly in consultation with the clinical advisory board.
+
+NOTE: README WAS GENERATED USING CLAUDE.AI
