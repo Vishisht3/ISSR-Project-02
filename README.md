@@ -57,22 +57,22 @@ Key design principles:
 
 ## 🚧 Current Status
 
-- [] Bot / coordination filter
-- [] Minimum sample size check (density-weighted + engagement-weighted)
-- [] Smoothing, normalisation, and calendar dampening
-- [] Four-layer bias mitigation
-- [] CI / uncertainty estimation (classifier-error-corrected)
-- [] Individual track: severity scoring, first-time flag, threshold routing
-- [] Contagion flagging (Werther Effect detection)
-- [] Aggregate track: event classification, media corroboration, bucketing
-- [] Aggregate track: crisis scoring, confidence-modulated threshold, confirmation window
-- [] HITL review queue (blocking pattern)
-- [] Audit log (immutable append-only)
-- [] Geographic heatmap output
-- [] Campaign effectiveness feedback loop
-- [] Pipeline orchestration (`CrisisPipeline` class)
-- [] Pipeline pseudocode document (`Pipeline_Pseudocode.docx`)
-- [] Integration adapter for Yixing Fan's ISSR prototype (`src/issr_adapter.py`)
+- [ ] Bot / coordination filter
+- [ ] Minimum sample size check (density-weighted + engagement-weighted)
+- [ ] Smoothing, normalisation, and calendar dampening
+- [ ] Four-layer bias mitigation
+- [ ] CI / uncertainty estimation (classifier-error-corrected)
+- [ ] Individual track: severity scoring, first-time flag, threshold routing
+- [ ] Contagion flagging (Werther Effect detection)
+- [ ] Aggregate track: event classification, media corroboration, bucketing
+- [ ] Aggregate track: crisis scoring, confidence-modulated threshold, confirmation window
+- [ ] HITL review queue (blocking pattern)
+- [ ] Audit log (immutable append-only)
+- [ ] Geographic heatmap output
+- [ ] Campaign effectiveness feedback loop
+- [ ] Pipeline orchestration (`CrisisPipeline` class)
+- [ ] Pipeline pseudocode document (`Pipeline_Pseudocode.docx`)
+- [ ] Integration adapter for Yixing Fan's ISSR prototype (`src/issr_adapter.py`)
 
 Future work: live dashboard integration, multi-language sentiment models, cross-platform demographic data refresh.
 
