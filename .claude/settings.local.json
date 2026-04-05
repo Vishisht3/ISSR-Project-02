@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/Admin/AppData/Roaming/Claude/local-agent-mode-sessions/skills-plugin/482a527f-aed3-4d8e-9617-26b7f0c617d5/fcf590e5-78ae-4100-aaf1-5b92a0360321/skills/docx/**)",
+      "Bash(python scripts/office/unpack.py \"C:\\\\Users\\\\Admin\\\\ISSR Project 02\\\\Pipeline_Pseudocode.docx\" \"C:\\\\Users\\\\Admin\\\\ISSR Project 02\\\\unpacked\")",
+      "Bash(pip install:*)",
+      "Bash(python scripts/office/pack.py unpacked/ Pipeline_Pseudocode.docx --original Pipeline_Pseudocode.docx)",
+      "Bash(PACK='/c/Users/Admin/AppData/Roaming/Claude/local-agent-mode-sessions/skills-plugin/482a527f-aed3-4d8e-9617-26b7f0c617d5/fcf590e5-78ae-4100-aaf1-5b92a0360321/skills/docx/scripts/office/pack.py')",
+      "Bash(python \"$PACK\" '/c/Users/Admin/ISSR Project 02/unpacked' '/c/Users/Admin/ISSR Project 02/Pipeline_Pseudocode.docx' --original '/c/Users/Admin/ISSR Project 02/Pipeline_Pseudocode.docx')",
+      "Bash(PYTHONIOENCODING=utf-8 python \"$PACK\" '/c/Users/Admin/ISSR Project 02/unpacked' '/c/Users/Admin/ISSR Project 02/Pipeline_Pseudocode.docx' --original '/c/Users/Admin/ISSR Project 02/Pipeline_Pseudocode.docx')",
+      "Bash(PYTHONIOENCODING=utf-8 python \"$PACK\" '/c/Users/Admin/ISSR Project 02/unpacked' '/c/Users/Admin/ISSR Project 02/Pipeline_Pseudocode.docx' --validate false)",
+      "Bash(python -c \":*)",
+      "WebFetch(domain:raw.githubusercontent.com)"
+    ]
+  }
+}
